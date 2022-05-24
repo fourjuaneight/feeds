@@ -52,8 +52,7 @@ export const addFeedItem = async (
         .join('\n')} \n ${query}`;
     }
 
-    return (response as HasuraInsertResp).data[`insert_feeds_${table}_one`]
-      .title;
+    return (response as HasuraInsertResp)[`insert_feeds_${table}_one`].title;
   } catch (error) {
     console.log('addFeedItem', error);
     throw `Adding record to Hasura - Feeds - ${table}: \n ${error}`;
@@ -113,7 +112,8 @@ export const updateFeedItem = async (
         .join('\n')} \n ${query}`;
     }
 
-    return (response as HasuraInsertResp).data[`update_feeds_${table}`].title;
+    return (response as HasuraUpdateResp)[`update_feeds_${table}`].returning[0]
+      .title;
   } catch (error) {
     console.log('updateFeedItem', error);
     throw `Updating record to Hasura - Feeds - ${table}: \n ${error}`;

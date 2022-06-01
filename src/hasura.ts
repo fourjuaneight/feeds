@@ -161,7 +161,8 @@ export const addFeedItem = async (
         .join('\n')} \n ${query}`;
     }
 
-    return (response as HasuraInsertResp)[`insert_feeds_${table}_one`].title;
+    return (response as HasuraInsertResp).data[`insert_feeds_${table}_one`]
+      .title;
   } catch (error) {
     console.log('addFeedItem', error);
     throw `Adding record to Hasura - Feeds - ${table}: \n ${error}`;

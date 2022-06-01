@@ -8,8 +8,10 @@ export interface Feed {
 }
 
 export interface HasuraInsertResp {
-  [key: string]: {
-    title: string;
+  data: {
+    [key: string]: {
+      title: string;
+    };
   };
 }
 

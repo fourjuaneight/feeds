@@ -90,7 +90,6 @@ export const queryFeedItems = async (table: string): Promise<Feed[]> => {
     if (response.errors) {
       const { errors } = response as HasuraErrors;
 
-      console.log('queryFeedItems', errors);
       throw `Querying records from Hasura - Feeds - ${table}: \n ${errors
         .map(err => `${err.extensions.path}: ${err.message}`)
         .join('\n')} \n ${query}`;
@@ -99,7 +98,7 @@ export const queryFeedItems = async (table: string): Promise<Feed[]> => {
     return (response as HasuraQueryResp).data[`feeds_${table}`];
   } catch (error) {
     console.log('queryFeedItems', error);
-    throw `Querying records from Hasura - Feeds - ${table}: \n ${error}`;
+    throw error;
   }
 };
 
@@ -144,7 +143,6 @@ export const searchFeedItems = async (
     if (response.errors) {
       const { errors } = response as HasuraErrors;
 
-      console.log('searchFeedItems', errors);
       throw `Searching records from Hasura - Feeds - ${table}: \n ${errors
         .map(err => `${err.extensions.path}: ${err.message}`)
         .join('\n')} \n ${query}`;
@@ -153,7 +151,7 @@ export const searchFeedItems = async (
     return (response as HasuraQueryResp).data[`feeds_${table}`];
   } catch (error) {
     console.log('searchFeedItems', error);
-    throw `Searching records from Hasura - Feeds - ${table}: \n ${error}`;
+    throw error;
   }
 };
 
@@ -187,8 +185,6 @@ export const addFeedItem = async (
     const existing = await searchFeedItems(table, item.title);
 
     if (existing.length !== 0) {
-      console.log('addFeedItem', 'Feed already exists.');
-
       throw `Adding record to Hasura - Feeds: Feed already exists.`;
     }
 
@@ -205,7 +201,6 @@ export const addFeedItem = async (
     if (response.errors) {
       const { errors } = response as HasuraErrors;
 
-      console.log('addFeedItem', errors);
       throw `Adding record to Hasura - Feeds - ${table}: \n ${errors
         .map(err => `${err.extensions.path}: ${err.message}`)
         .join('\n')} \n ${query}`;
@@ -215,7 +210,7 @@ export const addFeedItem = async (
       .title;
   } catch (error) {
     console.log('addFeedItem', error);
-    throw `Adding record to Hasura - Feeds - ${table}: \n ${error}`;
+    throw error;
   }
 };
 
@@ -266,7 +261,6 @@ export const updateFeedItem = async (
     if (response.errors) {
       const { errors } = response as HasuraErrors;
 
-      console.log('updateFeedItem', errors);
       throw `Updating record to Hasura - Feeds - ${table}: \n ${errors
         .map(err => `${err.extensions.path}: ${err.message}`)
         .join('\n')} \n ${query}`;
@@ -276,6 +270,6 @@ export const updateFeedItem = async (
       .title;
   } catch (error) {
     console.log('updateFeedItem', error);
-    throw `Updating record to Hasura - Feeds - ${table}: \n ${error}`;
+    throw error;
   }
 };

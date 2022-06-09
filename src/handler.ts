@@ -1,7 +1,7 @@
-import { podcast, youtube, website } from './categories';
 import {
   addFeedItem,
   queryFeedItems,
+  queryTags,
   searchFeedItems,
   updateFeedItem,
 } from './hasura';
@@ -28,12 +28,6 @@ const noAuthReqBody = {
   status: 401,
   statusText: 'Unauthorized',
   ...responseInit,
-};
-// match tags list to array of tags
-const tagsList: { [key: string]: string[] } = {
-  podcast,
-  youtube,
-  website,
 };
 
 const missingData = (data: Feed | undefined): boolean => {
@@ -62,24 +56,25 @@ const missingData = (data: Feed | undefined): boolean => {
  * @returns {Promise<Response>} response
  */
 const handleAction = async (payload: RequestPayload): Promise<Response> => {
-  const { table, type } = payload;
+  const { table, type, tagList } = payload;
 
   try {
     // determine which type and method to use
     switch (true) {
-      case payload.type === 'Tags': {
-        const list = payload.tagList as string;
+      case type === 'Tags': {
+        const selectedTagList = tagList as string;
+        const tags = await queryTags(selectedTagList);
 
         return new Response(
           JSON.stringify({
-            tags: tagsList[list],
+            tags,
             table,
-            location: list,
+            location: type,
           }),
           responseInit
         );
       }
-      case payload.type === 'Insert':
+      case type === 'Insert':
         const insertData = payload.data as Feed;
         const saved = await addFeedItem(table, insertData);
 
@@ -92,7 +87,7 @@ const handleAction = async (payload: RequestPayload): Promise<Response> => {
           responseInit
         );
         break;
-      case payload.type === 'Update':
+      case type === 'Update':
         const updateData = payload.data as Feed;
         const updated = await updateFeedItem(
           table,
@@ -109,7 +104,7 @@ const handleAction = async (payload: RequestPayload): Promise<Response> => {
           responseInit
         );
         break;
-      case payload.type === 'Search':
+      case type === 'Search':
         const searchPattern = payload.query as string;
         const searchItems = await searchFeedItems(table, searchPattern);
 

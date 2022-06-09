@@ -29,6 +29,12 @@ export interface HasuraQueryResp {
   };
 }
 
+export interface HasuraQueryTagsResp {
+  data: {
+    meta_categories: { name: string }[];
+  };
+}
+
 export interface HasuraErrors {
   errors: {
     extensions: {

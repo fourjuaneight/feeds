@@ -3,8 +3,58 @@ import {
   HasuraErrors,
   HasuraInsertResp,
   HasuraQueryResp,
+  HasuraQueryTagsResp,
   HasuraUpdateResp,
 } from './typings.d';
+
+/**
+ * Get bookmark tags from Hasura.
+ * @function
+ * @async
+ *
+ * @param {string} type table name
+ * @returns {Promise<RecordData[]>}
+ */
+export const queryTags = async (type: string): Promise<string[]> => {
+  const query = `
+    {
+      meta_categories(where: {table: {_eq: "feeds"}, type: {_eq: "${type}"}}) {
+        name
+      }
+    }
+  `;
+
+  try {
+    const request = await fetch(`${HASURA_ENDPOINT}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Hasura-Admin-Secret': `${HASURA_ADMIN_SECRET}`,
+      },
+      body: JSON.stringify({ query }),
+    });
+    const response: HasuraQueryTagsResp | HasuraErrors = await request.json();
+
+    if (response.errors) {
+      const { errors } = response as HasuraErrors;
+
+      throw `Querying tags from Hasura - ${table} - ${type}: \n ${errors
+        .map(err => `${err.extensions.path}: ${err.message}`)
+        .join('\n')} \n ${query}`;
+    }
+
+    console.log('queryTags', response);
+
+    const tags = (response as HasuraQueryTagsResp).data.meta_categories.map(
+      tag => tag.name
+    );
+
+    return tags;
+  } catch (error) {
+    console.log('queryTags', error);
+    throw error;
+  }
+};
 
 /**
  * Get feed entries from Hasura.

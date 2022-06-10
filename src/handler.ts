@@ -56,41 +56,39 @@ const missingData = (data: Feed | undefined): boolean => {
  * @returns {Promise<Response>} response
  */
 const handleAction = async (payload: RequestPayload): Promise<Response> => {
-  const { table, type, tagList } = payload;
-
   try {
     // determine which type and method to use
     switch (true) {
-      case type === 'Tags': {
-        const selectedTagList = tagList as string;
+      case payload.type === 'Tags': {
+        const selectedTagList = payload.tagList as string;
         const tags = await queryTags(selectedTagList);
 
         return new Response(
           JSON.stringify({
             tags,
-            table,
-            location: type,
+            table: payload.table,
+            location: payload.type,
           }),
           responseInit
         );
       }
-      case type === 'Insert':
+      case payload.type === 'Insert':
         const insertData = payload.data as Feed;
-        const saved = await addFeedItem(table, insertData);
+        const saved = await addFeedItem(payload.table, insertData);
 
         return new Response(
           JSON.stringify({
             saved,
-            table,
-            location: type,
+            table: payload.table,
+            location: payload.type,
           }),
           responseInit
         );
         break;
-      case type === 'Update':
+      case payload.type === 'Update':
         const updateData = payload.data as Feed;
         const updated = await updateFeedItem(
-          table,
+          payload.table,
           updateData.id as string,
           updateData
         );
@@ -98,31 +96,31 @@ const handleAction = async (payload: RequestPayload): Promise<Response> => {
         return new Response(
           JSON.stringify({
             updated,
-            table,
-            location: type,
+            table: payload.table,
+            location: payload.type,
           }),
           responseInit
         );
         break;
-      case type === 'Search':
+      case payload.type === 'Search':
         const searchPattern = payload.query as string;
-        const searchItems = await searchFeedItems(table, searchPattern);
+        const searchItems = await searchFeedItems(payload.table, searchPattern);
 
         return new Response(
           JSON.stringify({
             items: searchItems,
-            table,
+            table: payload.table,
           }),
           responseInit
         );
         break;
       default: {
-        const queryItems = await queryFeedItems(table);
+        const queryItems = await queryFeedItems(payload.table);
 
         return new Response(
           JSON.stringify({
             items: queryItems,
-            table,
+            table: payload.table,
           }),
           responseInit
         );
@@ -132,7 +130,7 @@ const handleAction = async (payload: RequestPayload): Promise<Response> => {
   } catch (error) {
     console.log('handleAction', error);
     return new Response(
-      JSON.stringify({ error, table, location: type }),
+      JSON.stringify({ error, table: payload.table, location: payload.type }),
       errReqBody
     );
   }

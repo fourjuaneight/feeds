@@ -8,17 +8,17 @@ import {
 } from './typings.d';
 
 /**
- * Get bookmark tags from Hasura.
+ * Get feed tags from Hasura.
  * @function
  * @async
  *
- * @param {string} type table name
+ * @param {string} table table name
  * @returns {Promise<RecordData[]>}
  */
-export const queryTags = async (type: string): Promise<string[]> => {
+export const queryTags = async (table: string): Promise<string[]> => {
   const query = `
     {
-      meta_categories(where: {table: {_eq: "feeds"}, type: {_eq: "${type}"}}) {
+      meta_categories(where: {schema: {_eq: "feeds"}, table: {_eq: "${table}"}}) {
         name
       }
     }
@@ -38,12 +38,10 @@ export const queryTags = async (type: string): Promise<string[]> => {
     if (response.errors) {
       const { errors } = response as HasuraErrors;
 
-      throw `Querying tags from Hasura - ${table} - ${type}: \n ${errors
+      throw `(queryTags) - ${table}: \n ${errors
         .map(err => `${err.extensions.path}: ${err.message}`)
         .join('\n')} \n ${query}`;
     }
-
-    console.log('queryTags', response);
 
     const tags = (response as HasuraQueryTagsResp).data.meta_categories.map(
       tag => tag.name
@@ -51,7 +49,7 @@ export const queryTags = async (type: string): Promise<string[]> => {
 
     return tags;
   } catch (error) {
-    console.log('queryTags', error);
+    console.log(error);
     throw error;
   }
 };
@@ -90,14 +88,14 @@ export const queryFeedItems = async (table: string): Promise<Feed[]> => {
     if (response.errors) {
       const { errors } = response as HasuraErrors;
 
-      throw `Querying records from Hasura - Feeds - ${table}: \n ${errors
+      throw `(queryFeedItems) - ${table}: \n ${errors
         .map(err => `${err.extensions.path}: ${err.message}`)
         .join('\n')} \n ${query}`;
     }
 
     return (response as HasuraQueryResp).data[`feeds_${table}`];
   } catch (error) {
-    console.log('queryFeedItems', error);
+    console.log(error);
     throw error;
   }
 };
@@ -143,14 +141,14 @@ export const searchFeedItems = async (
     if (response.errors) {
       const { errors } = response as HasuraErrors;
 
-      throw `Searching records from Hasura - Feeds - ${table}: \n ${errors
+      throw `(searchFeedItems) - ${table}: \n ${errors
         .map(err => `${err.extensions.path}: ${err.message}`)
         .join('\n')} \n ${query}`;
     }
 
     return (response as HasuraQueryResp).data[`feeds_${table}`];
   } catch (error) {
-    console.log('searchFeedItems', error);
+    console.log(error);
     throw error;
   }
 };
@@ -185,7 +183,7 @@ export const addFeedItem = async (
     const existing = await searchFeedItems(table, item.title);
 
     if (existing.length !== 0) {
-      throw `Adding record to Hasura - Feeds: Feed already exists.`;
+      throw `(addFeedItem): Feed already exists.`;
     }
 
     const request = await fetch(`${HASURA_ENDPOINT}`, {
@@ -201,7 +199,7 @@ export const addFeedItem = async (
     if (response.errors) {
       const { errors } = response as HasuraErrors;
 
-      throw `Adding record to Hasura - Feeds - ${table}: \n ${errors
+      throw `(addFeedItem) - ${table}: \n ${errors
         .map(err => `${err.extensions.path}: ${err.message}`)
         .join('\n')} \n ${query}`;
     }
@@ -209,7 +207,7 @@ export const addFeedItem = async (
     return (response as HasuraInsertResp).data[`insert_feeds_${table}_one`]
       .title;
   } catch (error) {
-    console.log('addFeedItem', error);
+    console.log(error);
     throw error;
   }
 };
@@ -261,7 +259,7 @@ export const updateFeedItem = async (
     if (response.errors) {
       const { errors } = response as HasuraErrors;
 
-      throw `Updating record to Hasura - Feeds - ${table}: \n ${errors
+      throw `(updateFeedItem) - ${table}: \n ${errors
         .map(err => `${err.extensions.path}: ${err.message}`)
         .join('\n')} \n ${query}`;
     }
@@ -269,7 +267,7 @@ export const updateFeedItem = async (
     return (response as HasuraUpdateResp)[`update_feeds_${table}`].returning[0]
       .title;
   } catch (error) {
-    console.log('updateFeedItem', error);
+    console.log(error);
     throw error;
   }
 };

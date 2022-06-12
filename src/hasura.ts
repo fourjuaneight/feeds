@@ -70,6 +70,7 @@ export const queryFeedItems = async (table: string): Promise<Feed[]> => {
         rss
         title
         url
+        id
       }
     }
   `;
@@ -123,6 +124,7 @@ export const searchFeedItems = async (
         rss
         title
         url
+        id
       }
     }
   `;

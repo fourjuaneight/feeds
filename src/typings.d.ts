@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-export type AggregateTable = 'podcasts' | 'websites' | 'youtube';
+export type TableAggregate = 'podcasts' | 'websites' | 'youtube';
 
 export interface Feed {
   category: string;
@@ -65,4 +65,5 @@ export interface RequestPayload {
   tagList?: string;
   data?: Feed;
   query?: string;
+  countColumn?: string;
 }

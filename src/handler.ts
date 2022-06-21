@@ -7,7 +7,7 @@ import {
   updateFeedItem,
 } from './hasura';
 
-import { RequestPayload, Feed } from './typings.d';
+import { Feed, RequestPayload, TableAggregate } from './typings.d';
 
 // default responses
 const responseInit = {
@@ -119,7 +119,9 @@ const handleAction = async (payload: RequestPayload): Promise<Response> => {
         break;
       }
       case payload.type === 'Count': {
-        const queryResults = await queryFeedsAggregateCount(payload.table);
+        const queryResults = await queryFeedsAggregateCount(
+          payload.table as TableAggregate
+        );
 
         return new Response(
           JSON.stringify({

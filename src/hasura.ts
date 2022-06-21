@@ -1,5 +1,4 @@
 import {
-  AggregateTable,
   Feed,
   HasuraErrors,
   HasuraInsertResp,
@@ -8,6 +7,7 @@ import {
   HasuraQueryTagsResp,
   HasuraUpdateResp,
   RecordColumnAggregateCount,
+  TableAggregate,
 } from './typings.d';
 
 const countUnique = (iterable: string[]) =>
@@ -85,7 +85,7 @@ export const queryTags = async (table: string): Promise<string[]> => {
  * @returns {Promise<RecordColumnAggregateCount>}
  */
 export const queryFeedsAggregateCount = async (
-  table: AggregateTable
+  table: TableAggregate
 ): Promise<RecordColumnAggregateCount> => {
   const query = `
     {

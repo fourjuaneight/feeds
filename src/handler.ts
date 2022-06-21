@@ -1,6 +1,7 @@
 import {
   addFeedItem,
   queryFeedItems,
+  queryFeedsAggregateCount,
   queryTags,
   searchFeedItems,
   updateFeedItem,
@@ -72,7 +73,7 @@ const handleAction = async (payload: RequestPayload): Promise<Response> => {
           responseInit
         );
       }
-      case payload.type === 'Insert':
+      case payload.type === 'Insert': {
         const insertData = payload.data as Feed;
         const saved = await addFeedItem(payload.table, insertData);
 
@@ -85,7 +86,8 @@ const handleAction = async (payload: RequestPayload): Promise<Response> => {
           responseInit
         );
         break;
-      case payload.type === 'Update':
+      }
+      case payload.type === 'Update': {
         const updateData = payload.data as Feed;
         const updated = await updateFeedItem(
           payload.table,
@@ -102,7 +104,8 @@ const handleAction = async (payload: RequestPayload): Promise<Response> => {
           responseInit
         );
         break;
-      case payload.type === 'Search':
+      }
+      case payload.type === 'Search': {
         const searchPattern = payload.query as string;
         const searchItems = await searchFeedItems(payload.table, searchPattern);
 
@@ -114,6 +117,18 @@ const handleAction = async (payload: RequestPayload): Promise<Response> => {
           responseInit
         );
         break;
+      }
+      case payload.type === 'Count': {
+        const queryResults = await queryFeedsAggregateCount(payload.table);
+
+        return new Response(
+          JSON.stringify({
+            count: queryResults,
+            table: payload.table,
+          }),
+          responseInit
+        );
+      }
       default: {
         const queryItems = await queryFeedItems(payload.table);
 
@@ -197,6 +212,11 @@ export const handleRequest = async (request: Request): Promise<Response> => {
       case payload.type === 'Search' && !payload.query:
         return new Response(
           JSON.stringify({ error: 'Missing Search query.' }),
+          badReqBody
+        );
+      case payload.type === 'Count' && !payload.table:
+        return new Response(
+          JSON.stringify({ error: "Missing 'table' parameter." }),
           badReqBody
         );
       case !key:

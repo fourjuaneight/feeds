@@ -1,11 +1,30 @@
 import {
+  AggregateTable,
   Feed,
   HasuraErrors,
   HasuraInsertResp,
+  HasuraQueryAggregateResp,
   HasuraQueryResp,
   HasuraQueryTagsResp,
   HasuraUpdateResp,
+  RecordColumnAggregateCount,
 } from './typings.d';
+
+const countUnique = (iterable: string[]) =>
+  iterable.reduce((acc: RecordColumnAggregateCount, item) => {
+    acc[item] = (acc[item] || 0) + 1;
+    return acc;
+  }, {});
+
+const countUniqueSorted = (iterable: string[]) =>
+  // sort descending by count
+  Object.entries(countUnique(iterable))
+    .sort((a, b) => b[1] - a[1])
+    .reduce(
+      (acc: RecordColumnAggregateCount, [key, val]) =>
+        ({ ...acc, [key]: val } as RecordColumnAggregateCount),
+      {}
+    );
 
 /**
  * Get feed tags from Hasura.
@@ -51,6 +70,54 @@ export const queryTags = async (table: string): Promise<string[]> => {
     );
 
     return tags;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+/**
+ * Get aggregated count of feeds column from Hasura.
+ * @function
+ * @async
+ *
+ * @param {string} table
+ * @returns {Promise<RecordColumnAggregateCount>}
+ */
+export const queryFeedsAggregateCount = async (
+  table: AggregateTable
+): Promise<RecordColumnAggregateCount> => {
+  const query = `
+    {
+      feeds_${table}(order_by: {title: asc}) {
+        category
+      }
+    }
+  `;
+
+  try {
+    const request = await fetch(`${HASURA_ENDPOINT}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Hasura-Admin-Secret': `${HASURA_ADMIN_SECRET}`,
+      },
+      body: JSON.stringify({ query }),
+    });
+    const response: any = await request.json();
+
+    if (response.errors) {
+      const { errors } = response as HasuraErrors;
+
+      throw `(queryFeedsAggregateCount) - ${table}: \n ${errors
+        .map(err => `${err.extensions.path}: ${err.message}`)
+        .join('\n')} \n ${query}`;
+    }
+
+    const data = (response as HasuraQueryAggregateResp).data[`feeds_${table}`];
+    const collection = data.map(item => item.category);
+
+    return countUniqueSorted(collection);
   } catch (error) {
     console.log(error);
     throw error;

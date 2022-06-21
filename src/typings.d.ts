@@ -1,10 +1,16 @@
 /* eslint-disable camelcase */
+export type AggregateTable = 'podcasts' | 'websites' | 'youtube';
+
 export interface Feed {
   category: string;
   id?: string;
   rss: string;
   title: string;
   url: string;
+}
+
+export interface RecordColumnAggregateCount {
+  [key: string]: number;
 }
 
 export interface HasuraInsertResp {
@@ -26,6 +32,14 @@ export interface HasuraUpdateResp {
 export interface HasuraQueryResp {
   data: {
     [key: string]: Feed[];
+  };
+}
+
+export interface HasuraQueryAggregateResp {
+  data: {
+    [key: string]: {
+      [key: string]: string;
+    }[];
   };
 }
 

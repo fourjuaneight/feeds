@@ -198,7 +198,7 @@ export const queryFeedsAggregateCount = async (
 export const queryFeedItems = async (
   table: string
 ): Promise<Feed[] | SocialFeed[]> => {
-  const query = getQuery();
+  const query = getQuery(table);
 
   try {
     const request = await fetch(`${HASURA_ENDPOINT}`, {

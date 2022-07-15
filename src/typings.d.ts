@@ -9,6 +9,15 @@ export interface Feed {
   url: string;
 }
 
+export interface SocialFeed {
+  description: string;
+  id?: string;
+  list?: string;
+  name: string;
+  username?: string;
+  url: string;
+}
+
 export interface RecordColumnAggregateCount {
   [key: string]: number;
 }
@@ -31,7 +40,7 @@ export interface HasuraUpdateResp {
 
 export interface HasuraQueryResp {
   data: {
-    [key: string]: Feed[];
+    [key: string]: Feed[] | SocialFeed[];
   };
 }
 

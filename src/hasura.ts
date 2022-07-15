@@ -7,8 +7,71 @@ import {
   HasuraQueryTagsResp,
   HasuraUpdateResp,
   RecordColumnAggregateCount,
+  SocialFeed,
   TableAggregate,
 } from './typings.d';
+
+const getQuery = (table: string, searchPat?: string) => {
+  const column = table === 'reddit' || table === 'twitter' ? 'name' : 'title';
+  const where = searchPat
+    ? `, where: {${column}: {_iregex: ".*${searchPat}.*"}}`
+    : '';
+
+  switch (table) {
+    case 'reddit':
+      return `
+        {
+          feeds_reddit(order_by: {name: asc}${where}) {
+            name
+            description
+            url
+            id
+          }
+        }
+      `;
+    case 'twitter':
+      return `
+        {
+          feeds_twitter(order_by: {name: asc}${where}) {
+            name
+            username
+            description
+            list
+            url
+            id
+          }
+        }
+      `;
+    default:
+      return `
+        {
+          feeds_${table}(order_by: {title: asc}${where}) {
+            category
+            rss
+            title
+            url
+            id
+          }
+        }
+      `;
+  }
+};
+
+const objToQueryString = (obj: { [key: string]: any }) =>
+  Object.keys(obj).map(key => {
+    const value = obj[key];
+    const fmtValue =
+      typeof value === 'string'
+        ? `"${value
+            .replace(/\\/g, '')
+            .replace(/"/g, '\\"')
+            .replace(/\n/g, '\\n')}"`
+        : Array.isArray(value)
+        ? `"{${value.join(',')}}"`
+        : value;
+
+    return `${key}: ${fmtValue}`;
+  });
 
 const countUnique = (iterable: string[]) =>
   iterable.reduce((acc: RecordColumnAggregateCount, item) => {
@@ -130,20 +193,12 @@ export const queryFeedsAggregateCount = async (
  * @async
  *
  * @param {string} table
- * @returns {Promise<Feed[]>}
+ * @returns {Promise<Feed[] | SocialFeed[]>}
  */
-export const queryFeedItems = async (table: string): Promise<Feed[]> => {
-  const query = `
-    {
-      feeds_${table}(order_by: {title: asc}) {
-        category
-        rss
-        title
-        url
-        id
-      }
-    }
-  `;
+export const queryFeedItems = async (
+  table: string
+): Promise<Feed[] | SocialFeed[]> => {
+  const query = getQuery();
 
   try {
     const request = await fetch(`${HASURA_ENDPOINT}`, {
@@ -178,26 +233,13 @@ export const queryFeedItems = async (table: string): Promise<Feed[]> => {
  *
  * @param {string} table
  * @param {string} pattern feed item title
- * @returns {Promise<Feed[]>}
+ * @returns {Promise<Feed[] | SocialFeed[]>}
  */
 export const searchFeedItems = async (
   table: string,
   pattern: string
-): Promise<Feed[]> => {
-  const query = `
-    {
-      feeds_${table}(
-        order_by: {title: asc},
-        where: {title: {_iregex: ".*${pattern}.*"}}
-      ) {
-        category
-        rss
-        title
-        url
-        id
-      }
-    }
-  `;
+): Promise<Feed[] | SocialFeed[]> => {
+  const query = getQuery(table, pattern);
 
   try {
     const request = await fetch(`${HASURA_ENDPOINT}`, {
@@ -238,15 +280,12 @@ export const addFeedItem = async (
   table: string,
   item: Feed
 ): Promise<string> => {
+  const column = table === 'reddit' || table === 'twitter' ? 'name' : 'title';
   const query = `
     mutation {
-      insert_feeds_${table}_one(object: {
-        category: "${item.category}",
-        rss: "${item.rss}",
-        title: "${item.title}",
-        url: "${item.url}"
+        insert_feeds_${table}_one(object: { ${objToQueryString(item)} }) {
        }) {
-        title
+        ${column}
       }
     }
   `;
@@ -299,19 +338,15 @@ export const updateFeedItem = async (
   id: string,
   item: Feed
 ): Promise<string> => {
+  const column = table === 'reddit' || table === 'twitter' ? 'name' : 'title';
   const query = `
     mutation {
       update_feeds_${table}(
         where: {id: {_eq: "${id}"}},
-        _set: {
-          category: "${item.category}",
-          rss: "${item.rss}",
-          title: "${item.title}",
-          url: "${item.url}"
-        }
+        _set: { ${objToQueryString(item)} }
       ) {
         returning {
-          title
+          ${column}
         }
       }
     }

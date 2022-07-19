@@ -240,7 +240,6 @@ export const searchFeedItems = async (
   pattern: string
 ): Promise<Feed[] | SocialFeed[]> => {
   const query = getQuery(table, pattern);
-  console.log(query);
 
   try {
     const request = await fetch(`${HASURA_ENDPOINT}`, {
@@ -293,7 +292,6 @@ export const addFeedItem = async (
 
   try {
     const existing = await searchFeedItems(table, item.title);
-    console.log(existing);
 
     if (existing.length !== 0) {
       throw `(addFeedItem): Feed already exists.`;

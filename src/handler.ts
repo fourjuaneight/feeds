@@ -191,14 +191,14 @@ export const handleRequest = async (request: Request): Promise<Response> => {
           JSON.stringify({ error: "Missing 'type' parameter." }),
           badReqBody
         );
-      case !payload.table:
-        return new Response(
-          JSON.stringify({ error: "Missing 'table' parameter." }),
-          badReqBody
-        );
       case payload.type === 'Tags' && !payload.tagList:
         return new Response(
           JSON.stringify({ error: "Missing 'tagList' parameter." }),
+          badReqBody
+        );
+      case !payload.table:
+        return new Response(
+          JSON.stringify({ error: "Missing 'table' parameter." }),
           badReqBody
         );
       case payload.type === 'Insert' && missingData(payload.data):

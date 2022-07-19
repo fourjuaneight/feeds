@@ -283,8 +283,7 @@ export const addFeedItem = async (
   const column = table === 'reddit' || table === 'twitter' ? 'name' : 'title';
   const query = `
     mutation {
-        insert_feeds_${table}_one(object: { ${objToQueryString(item)} }) {
-       }) {
+      insert_feeds_${table}_one(object: { ${objToQueryString(item)} }) {
         ${column}
       }
     }

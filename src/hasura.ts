@@ -9,9 +9,10 @@ import {
   RecordColumnAggregateCount,
   SocialFeed,
   TableAggregate,
+  Tables,
 } from './typings.d';
 
-const getQuery = (table: string, searchPat?: string) => {
+const getQuery = (table: Tables, searchPat?: string) => {
   const column = table === 'reddit' || table === 'twitter' ? 'name' : 'title';
   const where = searchPat
     ? `, where: {${column}: {_iregex: ".*${searchPat}.*"}}`
@@ -94,10 +95,10 @@ const countUniqueSorted = (iterable: string[]) =>
  * @function
  * @async
  *
- * @param {string} table table name
+ * @param {Tables} table table name
  * @returns {Promise<RecordData[]>}
  */
-export const queryTags = async (table: string): Promise<string[]> => {
+export const queryTags = async (table: Tables): Promise<string[]> => {
   const query = `
     {
       meta_categories(
@@ -144,7 +145,7 @@ export const queryTags = async (table: string): Promise<string[]> => {
  * @function
  * @async
  *
- * @param {string} table
+ * @param {Tables} table
  * @returns {Promise<RecordColumnAggregateCount>}
  */
 export const queryFeedsAggregateCount = async (
@@ -192,11 +193,11 @@ export const queryFeedsAggregateCount = async (
  * @function
  * @async
  *
- * @param {string} table
+ * @param {Tables} table
  * @returns {Promise<Feed[] | SocialFeed[]>}
  */
 export const queryFeedItems = async (
-  table: string
+  table: Tables
 ): Promise<Feed[] | SocialFeed[]> => {
   const query = getQuery(table);
 
@@ -231,12 +232,12 @@ export const queryFeedItems = async (
  * @function
  * @async
  *
- * @param {string} table
+ * @param {Tables} table
  * @param {string} pattern feed item title
  * @returns {Promise<Feed[] | SocialFeed[]>}
  */
 export const searchFeedItems = async (
-  table: string,
+  table: Tables,
   pattern: string
 ): Promise<Feed[] | SocialFeed[]> => {
   const query = getQuery(table, pattern);
@@ -272,12 +273,12 @@ export const searchFeedItems = async (
  * @function
  * @async
  *
- * @param {string} table
+ * @param {Tables} table
  * @param {Feed} item data to upload
  * @returns {Promise<string>}
  */
 export const addFeedItem = async (
-  table: string,
+  table: Tables,
   item: Feed
 ): Promise<string> => {
   const column = table === 'reddit' || table === 'twitter' ? 'name' : 'title';
@@ -327,13 +328,13 @@ export const addFeedItem = async (
  * @function
  * @async
  *
- * @param {string} table
+ * @param {Tables} table
  * @param {string} id item id
  * @param {Feed} item data to update
  * @returns {Promise<string>}
  */
 export const updateFeedItem = async (
-  table: string,
+  table: Tables,
   id: string,
   item: Feed
 ): Promise<string> => {

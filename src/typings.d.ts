@@ -68,9 +68,13 @@ export interface HasuraErrors {
   }[];
 }
 
+export type Types = 'Tags' | 'Count' | 'Query' | 'Search' | 'Insert' | 'Update';
+
+export type Tables = 'podcasts' | 'reddit' | 'twitter' | 'websites' | 'youtube';
+
 export interface RequestPayload {
-  type: string;
-  table: string;
+  type: Types;
+  table: Tables;
   tagList?: string;
   data?: Feed;
   query?: string;

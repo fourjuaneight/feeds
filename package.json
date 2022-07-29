@@ -1,6 +1,6 @@
 {
   "name": "feeds",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Serverless functions to save RSS feeds to a Hasura database.",
   "main": "dist/worker.js",
   "scripts": {

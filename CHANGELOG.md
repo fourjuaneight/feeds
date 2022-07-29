@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2022-07-29
+
+### Bug Fixes
+
+- [Sign version tag commits.](https://github.com/fourjuaneight/feeds/commit/ff2dea3cb102df91a2f867b8436b157479b79c36)
+
+### Features
+
+- [Add default commit message when version bumping.](https://github.com/fourjuaneight/feeds/commit/0beea7f2389504d5a14f72331b6f787bcd311f4b)
+- [Return app version on response.](https://github.com/fourjuaneight/feeds/commit/c0f48a38ba188830d9fedc1129de5138a36257c4)
+
+### Miscellaneous Tasks
+
+- [Update Changelog.](https://github.com/fourjuaneight/feeds/commit/57213326d8ee19b3e26c271529c2f8f6771d12cf)
+- [Minor typing optimizations.](https://github.com/fourjuaneight/feeds/commit/819f623abc7b8813e86fa631ecd37a6831896daa)
+- [Update to v1.1.0.](https://github.com/fourjuaneight/feeds/commit/ba72937065a910eea016648351b47a36d6ed94ba)
+- [Update to v1.2.0.](https://github.com/fourjuaneight/feeds/commit/27a0dd076d5d66c0b0872ddaad94018c9bd1ee57)
+
 ## [1.1.0] - 2022-07-25
 
 ### Bug Fixes

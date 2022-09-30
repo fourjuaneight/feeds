@@ -9,6 +9,13 @@ export interface Feed {
   url: string;
 }
 
+export interface MangaFeed {
+  author: string;
+  id?: string;
+  mangadex_id: string;
+  title: string;
+}
+
 export interface SocialFeed {
   description: string;
   id?: string;
@@ -40,7 +47,7 @@ export interface HasuraUpdateResp {
 
 export interface HasuraQueryResp {
   data: {
-    [key: string]: Feed[] | SocialFeed[];
+    [key: string]: Feed[] | MangaFeed[] | SocialFeed[];
   };
 }
 
@@ -70,7 +77,13 @@ export interface HasuraErrors {
 
 export type Types = 'Tags' | 'Count' | 'Query' | 'Search' | 'Insert' | 'Update';
 
-export type Tables = 'podcasts' | 'reddit' | 'twitter' | 'websites' | 'youtube';
+export type Tables =
+  | 'manga'
+  | 'podcasts'
+  | 'reddit'
+  | 'twitter'
+  | 'websites'
+  | 'youtube';
 
 export interface RequestPayload {
   type: Types;

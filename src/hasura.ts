@@ -6,6 +6,7 @@ import {
   HasuraQueryResp,
   HasuraQueryTagsResp,
   HasuraUpdateResp,
+  MangaFeed,
   RecordColumnAggregateCount,
   SocialFeed,
   TableAggregate,
@@ -19,6 +20,17 @@ const getQuery = (table: Tables, searchPat?: string) => {
     : '';
 
   switch (table) {
+    case 'manga':
+      return `
+      {
+        feeds_manga(order_by: {title: asc}${where}) {
+          author
+          mangadex_id
+          title
+          id
+        }
+      }
+    `;
     case 'reddit':
       return `
         {
@@ -194,11 +206,11 @@ export const queryFeedsAggregateCount = async (
  * @async
  *
  * @param {Tables} table
- * @returns {Promise<Feed[] | SocialFeed[]>}
+ * @returns {Promise<Feed[] | MangaFeed[] | SocialFeed[]>}
  */
 export const queryFeedItems = async (
   table: Tables
-): Promise<Feed[] | SocialFeed[]> => {
+): Promise<Feed[] | MangaFeed[] | SocialFeed[]> => {
   const query = getQuery(table);
 
   try {

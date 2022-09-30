@@ -1,3 +1,4 @@
+import { getManga } from './mangadex';
 import {
   Feed,
   HasuraErrors,
@@ -6,6 +7,7 @@ import {
   HasuraQueryResp,
   HasuraQueryTagsResp,
   HasuraUpdateResp,
+  MangadexChapter,
   MangaFeed,
   RecordColumnAggregateCount,
   SocialFeed,
@@ -385,6 +387,19 @@ export const updateFeedItem = async (
 
     return (response as HasuraUpdateResp)[`update_feeds_${table}`].returning[0]
       .title;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const queryMangaFeedChapters = async (
+  id: string
+): Promise<MangadexChapter[]> => {
+  try {
+    const chapers = await getManga(id);
+
+    return chapers;
   } catch (error) {
     console.log(error);
     throw error;

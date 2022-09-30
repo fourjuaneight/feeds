@@ -2,6 +2,7 @@ import {
   addFeedItem,
   queryFeedItems,
   queryFeedsAggregateCount,
+  queryMangaFeedChapters,
   queryTags,
   searchFeedItems,
   updateFeedItem,
@@ -137,6 +138,18 @@ const handleAction = async (payload: RequestPayload): Promise<Response> => {
           responseInit
         );
       }
+      case payload.type === 'Chapters': {
+        const queryItems = await queryMangaFeedChapters(payload.query);
+
+        return new Response(
+          JSON.stringify({
+            items: queryItems,
+            table: payload.table,
+            version,
+          }),
+          responseInit
+        );
+      }
       default: {
         const queryItems = await queryFeedItems(payload.table);
 
@@ -148,7 +161,6 @@ const handleAction = async (payload: RequestPayload): Promise<Response> => {
           }),
           responseInit
         );
-        break;
       }
     }
   } catch (error) {
@@ -227,6 +239,11 @@ export const handleRequest = async (request: Request): Promise<Response> => {
           badReqBody
         );
       case payload.type === 'Search' && !payload.query:
+        return new Response(
+          JSON.stringify({ error: 'Missing Search query.', version }),
+          badReqBody
+        );
+      case payload.type === 'Chapters' && !payload.query:
         return new Response(
           JSON.stringify({ error: 'Missing Search query.', version }),
           badReqBody
